@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D rb;
     SpriteRenderer sr;
     Animator anim;
+    AudioManager audioManager;
 
     // State
     float moveInput;
@@ -44,6 +45,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
 
         // Rigidbody setup
         rb.gravityScale = 3f;
@@ -84,7 +86,9 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Attack pressed");
             lastAttackTime = Time.time;
             anim.SetTrigger("Attack");
+            audioManager.PlaySFX(audioManager.playerAttack);
             anim.SetBool("isAttacking", true);
+            
 
             if (attackHitbox != null)
             {

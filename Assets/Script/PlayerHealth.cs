@@ -8,11 +8,12 @@ public class PlayerHealth : MonoBehaviour
     int currentHealth;
     bool isDead = false;
     Animator anim;
-
+    AudioManager audioManager;
     void Awake()
     {
         currentHealth = maxHealth;
         anim = GetComponent<Animator>();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     public void TakeDamage(int amt)
@@ -31,6 +32,7 @@ public class PlayerHealth : MonoBehaviour
 
         Debug.Log("Player died!");
         anim.SetTrigger("Die");
+        audioManager.PlaySFX(audioManager.playerDeath);
 
         // Optional: disable movement and control scripts
         GetComponent<PlayerController>().enabled = false;

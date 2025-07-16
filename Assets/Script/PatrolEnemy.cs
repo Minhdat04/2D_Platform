@@ -33,6 +33,7 @@ public class PatrolEnemy : MonoBehaviour
     Rigidbody2D rb;
     SpriteRenderer sr;
     Animator anim;
+    AudioManager audioManager;
 
     // Patrol calculation
     Vector2 startPos;
@@ -49,6 +50,7 @@ public class PatrolEnemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
 
         // Thiết lập collider & rigidbody
         rb.bodyType = RigidbodyType2D.Dynamic;
@@ -127,6 +129,7 @@ public class PatrolEnemy : MonoBehaviour
         // Trigger animation
         isAttacking = true;
         anim.SetTrigger("Attack");
+        audioManager.PlaySFX(audioManager.skeletonAttack);
 
         // Bật hitbox nếu có
         if (attackHitbox != null)

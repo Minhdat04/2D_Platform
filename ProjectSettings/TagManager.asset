@@ -9,6 +9,7 @@ TagManager:
   - Trap
   - Jumper
   - Goal
+  - Audio
   layers:
   - Default
   - TransparentFX

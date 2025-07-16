@@ -17,11 +17,13 @@ public class EnemyHealth : MonoBehaviour
     bool isHit = false;
     bool isDead = false;
     Animator anim;
+    AudioManager audioManager;
 
     void Awake()
     {
         currentHealth = maxHealth;
         anim = GetComponent<Animator>();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     public void TakeDamage(int amt)
@@ -47,6 +49,7 @@ public class EnemyHealth : MonoBehaviour
     {
         isHit = true;
         anim.SetTrigger("Hit");
+        audioManager.PlaySFX(audioManager.skeletonHit);
 
         // wait out the hit?stun window
         yield return new WaitForSeconds(hitRecoveryTime);

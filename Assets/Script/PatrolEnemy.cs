@@ -38,6 +38,7 @@ public class PatrolEnemy : MonoBehaviour
     Vector2 startPos;
     float leftX, rightX;
     bool movingRight = true;
+    bool isAttacking = false;
 
     // State
     float lastAttackTime = -Mathf.Infinity;
@@ -93,6 +94,7 @@ public class PatrolEnemy : MonoBehaviour
 
     void Patrol()
     {
+        isAttacking = false;
         float dir = movingRight ? 1f : -1f;
         rb.velocity = new Vector2(dir * patrolSpeed, rb.velocity.y);
         sr.flipX = dir < 0f;
@@ -123,6 +125,7 @@ public class PatrolEnemy : MonoBehaviour
     void Attack()
     {
         // Trigger animation
+        isAttacking = true;
         anim.SetTrigger("Attack");
 
         // Bật hitbox nếu có

@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
     float moveInput;
     bool jumpRequested;
     bool isGrounded;
+    bool isAttacking;
 
     void Awake()
     {
@@ -83,6 +84,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Attack pressed");
             lastAttackTime = Time.time;
             anim.SetTrigger("Attack");
+            anim.SetBool("isAttacking", true);
 
             if (attackHitbox != null)
             {
@@ -93,6 +95,9 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.LogWarning("attackHitbox is null! Kéo Hitbox vào ô combat của PlayerController.");
             }
+            
+            // Kết thúc animation đòn đánh
+            StartCoroutine(ResetAttackState());
         }
 
         // —— Cập nhật animator Speed —— 
@@ -137,6 +142,13 @@ public class PlayerController : MonoBehaviour
 
         isDashing = false;
     }
+
+    IEnumerator ResetAttackState()
+    {
+        yield return new WaitForSeconds(attackCooldown);
+        isAttacking = false;
+    }
+
 
     void OnDrawGizmos()
     {

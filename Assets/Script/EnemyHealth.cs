@@ -1,31 +1,26 @@
-using System;
 using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
+    [Header("Enemy Health")]
     public int maxHealth = 3;
-    public int currentHealth { get; private set; }
-    public event Action<int, int> OnHealthChanged;
-    public event Action OnDied;
+    int currentHealth;
 
     void Awake()
     {
         currentHealth = maxHealth;
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
     public void TakeDamage(int amt)
     {
-        Debug.Log($"{name} takes {amt} damage");
-        currentHealth = Mathf.Clamp(currentHealth - amt, 0, maxHealth);
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        currentHealth -= amt;
+        Debug.Log($"{name} takes {amt} damage. HP = {currentHealth}");
         if (currentHealth <= 0) Die();
     }
 
     void Die()
     {
-        Debug.Log($"{name} died");
-        OnDied?.Invoke();
+        Debug.Log($"{name} died!");
         Destroy(gameObject);
     }
 }

@@ -1,6 +1,10 @@
 using UnityEngine;
+using System.Collections;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(SpriteRenderer), typeof(Collider2D))]
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(Collider2D))]
+[RequireComponent(typeof(Animator))]
 public class PatrolEnemy : MonoBehaviour
 {
     [Header("Patrol Settings")]
@@ -18,12 +22,17 @@ public class PatrolEnemy : MonoBehaviour
     public float attackCooldown = 1f;
     public int damage = 1;
 
+    [Header("Attack Hitbox")]
+    [Tooltip("Kéo GameObject chứa EnemyDamageDealer vào đây")]
+    public EnemyDamageDealer attackHitbox;
+
     // References
-    public Transform player;
+    Transform player;
 
     // Component cache
     Rigidbody2D rb;
     SpriteRenderer sr;
+    Animator anim;
 
     // Patrol calculation
     Vector2 startPos;
@@ -35,51 +44,50 @@ public class PatrolEnemy : MonoBehaviour
 
     void Awake()
     {
+        // Cache components
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
 
-        // Patrol boundaries
-        startPos = transform.position;
-        leftX = startPos.x - patrolRange;
-        rightX = startPos.x + patrolRange;
-
-        // Rigidbody setup
+        // Thiết lập collider & rigidbody
         rb.bodyType = RigidbodyType2D.Dynamic;
         rb.gravityScale = 1f;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
-        // Frictionless material
+        // Frictionless material để tránh “dính” tường/platform
         var mat = new PhysicsMaterial2D { friction = 0f, bounciness = 0f };
         GetComponent<Collider2D>().sharedMaterial = mat;
 
-        // Tự tìm Player nếu chưa gán
-        if (player == null && GameObject.FindWithTag("Player") != null)
-            player = GameObject.FindWithTag("Player").transform;
+        // Tính vùng patrol
+        startPos = transform.position;
+        leftX = startPos.x - patrolRange;
+        rightX = startPos.x + patrolRange;
+
+        // Tìm player theo tag
+        var go = GameObject.FindWithTag("Player");
+        if (go != null) player = go.transform;
     }
 
     void FixedUpdate()
     {
         if (player != null)
         {
-            float distToPlayer = Vector2.Distance(transform.position, player.position);
+            float dist = Vector2.Distance(transform.position, player.position);
 
-            if (distToPlayer <= attackRange)
+            if (dist <= attackRange)
             {
-                // Trong tầm attack → dừng lại và đánh
                 rb.velocity = new Vector2(0, rb.velocity.y);
                 TryAttack();
                 return;
             }
-            else if (distToPlayer <= chaseRange)
+            else if (dist <= chaseRange)
             {
-                // Trong tầm chase → đuổi
                 ChasePlayer();
                 return;
             }
         }
 
-        // Nếu không chase hoặc attack, chuyển về patrol
         Patrol();
     }
 
@@ -88,6 +96,7 @@ public class PatrolEnemy : MonoBehaviour
         float dir = movingRight ? 1f : -1f;
         rb.velocity = new Vector2(dir * patrolSpeed, rb.velocity.y);
         sr.flipX = dir < 0f;
+        anim.SetBool("isMoving", true);
 
         float px = rb.position.x;
         if (movingRight && px >= rightX) movingRight = false;
@@ -96,10 +105,10 @@ public class PatrolEnemy : MonoBehaviour
 
     void ChasePlayer()
     {
-        // Hướng ngang tới player
         float dir = player.position.x > transform.position.x ? 1f : -1f;
         rb.velocity = new Vector2(dir * chaseSpeed, rb.velocity.y);
         sr.flipX = dir < 0f;
+        anim.SetBool("isMoving", true);
     }
 
     void TryAttack()
@@ -113,19 +122,29 @@ public class PatrolEnemy : MonoBehaviour
 
     void Attack()
     {
-        // TODO: trigger animation tại đây
-        // anim.SetTrigger("Attack");
+        // Trigger animation
+        anim.SetTrigger("Attack");
 
-        // TODO: trừ HP cho Player nếu có script Health
-        var hp = player.GetComponent<PlayerHealth>();
-        if (hp != null)
-            hp.TakeDamage(damage);
+        // Bật hitbox nếu có
+        if (attackHitbox != null)
+        {
+            attackHitbox.damage = damage;
+            attackHitbox.DoAttack();
+        }
+        else
+        {
+            // Fallback: direct damage to player
+            var hp = player.GetComponent<PlayerHealth>();
+            if (hp != null)
+                hp.TakeDamage(damage);
+        }
     }
 
     void OnDrawGizmosSelected()
     {
-        // Vẽ patrol line
         Vector3 basePos = Application.isPlaying ? (Vector3)startPos : transform.position;
+
+        // Patrol line
         Gizmos.color = Color.yellow;
         Gizmos.DrawLine(
             new Vector3(basePos.x - patrolRange, basePos.y, 0),
@@ -134,11 +153,11 @@ public class PatrolEnemy : MonoBehaviour
         Gizmos.DrawSphere(new Vector3(basePos.x - patrolRange, basePos.y, 0), 0.1f);
         Gizmos.DrawSphere(new Vector3(basePos.x + patrolRange, basePos.y, 0), 0.1f);
 
-        // Vẽ chase range
+        // Chase range
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
 
-        // Vẽ attack range
+        // Attack range
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }

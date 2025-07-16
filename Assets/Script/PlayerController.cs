@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     public float groundCheckRadius = 0.2f;
 
     [Header("Combat")]
-    [Tooltip("Kéo GameObject Hitbox vào đây (chứa EnemyDamageDealer)")]
+    [Tooltip("Kéo GameObject Hitbox (có EnemyDamageDealer) vào đây")]
     public EnemyDamageDealer attackHitbox;
     public KeyCode attackKey = KeyCode.Mouse0;
     public float attackCooldown = 0.5f;
@@ -39,10 +39,12 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
+        // Cache components
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
 
+        // Rigidbody setup
         rb.gravityScale = 3f;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
@@ -50,10 +52,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // 1) Input di chuyển
+        // —— 1. Input di chuyển —— 
         moveInput = Input.GetAxisRaw("Horizontal");
 
-        // 2) Kiểm tra chạm đất
+        // —— 2. Kiểm tra chạm đất —— 
         isGrounded = Physics2D.OverlapCircle(
             groundCheck.position,
             groundCheckRadius,
@@ -61,21 +63,21 @@ public class PlayerController : MonoBehaviour
         );
         anim.SetBool("isGrounded", isGrounded);
 
-        // 3) Nhảy
+        // —— 3. Nhảy —— 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             jumpRequested = true;
             anim.SetTrigger("Jump");
         }
 
-        // 4) Dash
+        // —— 4. Dash —— 
         if (Input.GetKeyDown(KeyCode.X) && Time.time >= lastDashTime + dashCooldown)
         {
             lastDashTime = Time.time;
             StartCoroutine(DoDash());
         }
 
-        // 5) Attack
+        // —— 5. Attack —— 
         if (Input.GetKeyDown(attackKey) && Time.time >= lastAttackTime + attackCooldown)
         {
             Debug.Log("Attack pressed");
@@ -89,30 +91,30 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("attackHitbox is null! Kéo Hitbox vào slot này.");
+                Debug.LogWarning("attackHitbox is null! Kéo Hitbox vào ô combat của PlayerController.");
             }
         }
 
-        // Update chạy animation
+        // —— Cập nhật animator Speed —— 
         anim.SetFloat("speed", Mathf.Abs(moveInput));
     }
 
     void FixedUpdate()
     {
-        // A) Nhảy
+        // A) Thực hiện nhảy
         if (jumpRequested)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             jumpRequested = false;
         }
 
-        // B) Di chuyển
+        // B) Di chuyển bình thường nếu không dash
         if (!isDashing)
         {
             rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
         }
 
-        // C) Flip sprite
+        // C) Flip sprite theo hướng di chuyển
         if (moveInput != 0f)
             sr.flipX = moveInput < 0f;
     }
@@ -122,6 +124,7 @@ public class PlayerController : MonoBehaviour
         isDashing = true;
         anim.SetTrigger("Dash");
 
+        // Tính hướng dash dựa vào flipX
         Vector2 dir = sr.flipX ? Vector2.left : Vector2.right;
         float elapsed = 0f;
 
@@ -137,6 +140,7 @@ public class PlayerController : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        // Vẽ vòng tròn groundCheck
         if (groundCheck != null)
         {
             Gizmos.color = Color.red;

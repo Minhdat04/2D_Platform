@@ -10,6 +10,7 @@ TagManager:
   - Jumper
   - Goal
   - Audio
+  - Water
   layers:
   - Default
   - TransparentFX

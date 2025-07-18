@@ -297,7 +297,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbfed7f802696744a8efa87ca2ec8e9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healAmount: 2
 --- !u!58 &75330224
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -1036,10 +1035,6 @@ MonoBehaviour:
   healthBarTrailingFillImage: {fileID: 1781273881}
   trailDelay: 0.4
   maxHealth: 5
-  deathDelay: 1.5
-  hurtClip: {fileID: 0}
-  healClip: {fileID: 0}
-  deathClip: {fileID: 0}
 --- !u!114 &253028291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1333,8 +1328,8 @@ Transform:
   m_GameObject: {fileID: 348745513}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -456, y: 227, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalPosition: {x: -212, y: 59, z: 0}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 850337199}
@@ -4838,7 +4833,7 @@ RectTransform:
   m_GameObject: {fileID: 1281116395}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1224168228}
@@ -4847,7 +4842,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -24, y: -32}
+  m_AnchoredPosition: {x: -28, y: -84}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1312673259
